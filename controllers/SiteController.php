@@ -4,10 +4,36 @@ namespace app\controllers;
 
 use Yii;
 use yii\web\Controller;
+use yii\filters\AccessControl;
+use app\models\Peminjaman;
+use app\models\Ruang;
+use app\models\User;
 use app\models\LoginForm;
 
 class SiteController extends Controller
 {
+    public function behaviors()
+    {
+        return [
+            'access' => [
+                'class' => AccessControl::class,
+                'only' => ['index', 'logout'], // Hanya proteksi index dan logout
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'actions' => ['index'],
+                        'roles' => ['@'],
+                    ],
+                    [
+                        'allow' => true,
+                        'actions' => ['logout'],
+                        'roles' => ['@'],
+                    ],
+                ],
+            ],
+        ];
+    }
+
     public function actions()
     {
         return [
@@ -19,11 +45,55 @@ class SiteController extends Controller
 
     public function actionIndex()
     {
-        if (Yii::$app->user->isGuest) {
-            return $this->redirect(['login']);
-        }
+        $user = Yii::$app->user->identity;
         
-        return $this->render('index');
+        // Data untuk dashboard
+        $data = [];
+
+        if ($user->isAdministrator() || $user->isPetugas()) {
+            // Untuk Admin & Petugas - tampilkan semua data
+            $data['totalPeminjaman'] = Peminjaman::find()->count();
+            $data['peminjamanPending'] = Peminjaman::find()->where(['status' => 'pending'])->count();
+            $data['peminjamanDisetujui'] = Peminjaman::find()->where(['status' => 'disetujui'])->count();
+            $data['totalRuang'] = Ruang::find()->count();
+            $data['totalUsers'] = User::find()->count();
+            
+            // Data untuk chart (5 peminjaman terbaru)
+            $data['recentPeminjaman'] = Peminjaman::find()
+                ->with(['user', 'ruang'])
+                ->orderBy(['created_at' => SORT_DESC])
+                ->limit(5)
+                ->all();
+
+        } else {
+            // Untuk Peminjam - hanya tampilkan data miliknya sendiri
+            $userId = Yii::$app->user->id;
+            
+            $data['totalPeminjaman'] = Peminjaman::find()->where(['user_id' => $userId])->count();
+            $data['peminjamanPending'] = Peminjaman::find()->where([
+                'user_id' => $userId,
+                'status' => 'pending'
+            ])->count();
+            $data['peminjamanDisetujui'] = Peminjaman::find()->where([
+                'user_id' => $userId,
+                'status' => 'disetujui'
+            ])->count();
+            $data['totalRuang'] = Ruang::find()->count();
+            $data['totalUsers'] = null;
+            
+            // Data untuk chart (5 peminjaman terbaru milik user ini)
+            $data['recentPeminjaman'] = Peminjaman::find()
+                ->with(['user', 'ruang'])
+                ->where(['user_id' => $userId])
+                ->orderBy(['created_at' => SORT_DESC])
+                ->limit(5)
+                ->all();
+        }
+
+        return $this->render('index', [
+            'data' => $data,
+            'user' => $user,
+        ]);
     }
 
     public function actionLogin()
@@ -34,8 +104,6 @@ class SiteController extends Controller
 
         $model = new LoginForm();
         if ($model->load(Yii::$app->request->post()) && $model->login()) {
-            // Debug: Log user info after login
-            Yii::info("User logged in: " . Yii::$app->user->identity->username . " with role: " . Yii::$app->user->identity->role, 'login');
             return $this->goBack();
         }
 
@@ -49,60 +117,5 @@ class SiteController extends Controller
     {
         Yii::$app->user->logout();
         return $this->goHome();
-    }
-
-    public function actionTestLogin()
-    {
-        // Test manual login untuk debug
-        $user = \app\models\User::findByUsername('petugas');
-        
-        if ($user) {
-            echo "<h3>Debug User Info:</h3>";
-            echo "User found:<br>";
-            echo "ID: {$user->id}<br>";
-            echo "Username: {$user->username}<br>";
-            echo "Role: {$user->role}<br>";
-            echo "Email: {$user->email}<br>";
-            echo "Password in DB: {$user->password}<br>";
-            echo "Password match 'petugas123': " . ($user->validatePassword('petugas123') ? 'YES' : 'NO') . "<br>";
-            
-            echo "<h3>Attempting Login:</h3>";
-            // Try login
-            if (Yii::$app->user->login($user)) {
-                echo "Login SUCCESS!<br>";
-                echo "Current user ID: " . Yii::$app->user->id . "<br>";
-                echo "Current user username: " . Yii::$app->user->identity->username . "<br>";
-                echo "Current user role: " . Yii::$app->user->identity->role . "<br>";
-                echo "Current user email: " . Yii::$app->user->identity->email . "<br>";
-            } else {
-                echo "Login FAILED!<br>";
-            }
-        } else {
-            echo "User 'petugas' not found!";
-        }
-    }
-
-    public function actionTestDb()
-    {
-        try {
-            $users = \app\models\User::find()->count();
-            $ruang = \app\models\Ruang::find()->count();
-            $peminjaman = \app\models\Peminjaman::find()->count();
-            
-            echo "✅ Database connected!<br>";
-            echo "Users: $users<br>";
-            echo "Ruang: $ruang<br>";
-            echo "Peminjaman: $peminjaman<br>";
-            
-            // Test specific users
-            echo "<br><strong>User Details:</strong><br>";
-            $userList = \app\models\User::find()->all();
-            foreach ($userList as $user) {
-                echo "ID: {$user->id}, Username: {$user->username}, Role: {$user->role}, Email: {$user->email}<br>";
-            }
-            
-        } catch (\Exception $e) {
-            echo "❌ Error: " . $e->getMessage();
-        }
     }
 }

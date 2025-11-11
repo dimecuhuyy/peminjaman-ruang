@@ -159,6 +159,22 @@ class PeminjamanController extends Controller
         return $this->redirect(['index']);
     }
 
+    public function generateSesiOptions()
+{
+    $sesi = [];
+    $startTime = strtotime('07:00');
+    $endTime = strtotime('17:00');
+    
+    $counter = 1;
+    for ($time = $startTime; $time < $endTime; $time = strtotime('+45 minutes', $time)) {
+        $jamMulai = date('H:i', $time);
+        $jamSelesai = date('H:i', strtotime('+45 minutes', $time));
+        $sesi[$jamMulai] = "Sesi $counter: $jamMulai - $jamSelesai";
+        $counter++;
+    }
+    
+    return $sesi;
+}
     public function actionReject($id)
     {
         if (Yii::$app->user->isGuest || (!Yii::$app->user->identity->isAdministrator() && !Yii::$app->user->identity->isPetugas())) {

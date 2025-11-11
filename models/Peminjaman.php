@@ -157,7 +157,21 @@ class Peminjaman extends ActiveRecord
             'catatan' => 'Catatan',
         ];
     }
+public function getJumlahSesi()
+{
+    if ($this->jam_mulai && $this->jam_selesai) {
+        $mulai = strtotime($this->jam_mulai);
+        $selesai = strtotime($this->jam_selesai);
+        $diff = ($selesai - $mulai) / 60; // difference in minutes
+        return ceil($diff / 45); // convert to 45-minute sessions
+    }
+    return 0;
+}
 
+public function getDurasiMenit()
+{
+    return $this->getJumlahSesi() * 45;
+}
     public function getUser()
     {
         return $this->hasOne(User::class, ['id' => 'user_id']);
