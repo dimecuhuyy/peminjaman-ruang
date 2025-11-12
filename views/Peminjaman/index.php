@@ -27,7 +27,7 @@ $isPeminjam = Yii::$app->user->identity->isPeminjam();
                     <th>Status</th>
                     <?php if ($isAdmin || $isPetugas): ?>
                         <th>Peminjam</th>
-                        <th>Aksi</th>
+                        <th width="150">Aksi</th>
                     <?php endif; ?>
                 </tr>
             </thead>
@@ -48,22 +48,26 @@ $isPeminjam = Yii::$app->user->identity->isPeminjam();
                         <td><?= Html::encode($item->user->username) ?></td>
                         <td>
                             <?php if ($item->status === 'pending'): ?>
-                                <?= Html::a('Setujui', ['approve', 'id' => $item->id], [
-                                    'class' => 'btn btn-sm btn-success',
-                                    'data' => [
-                                        'confirm' => 'Setujui peminjaman ini?',
-                                        'method' => 'post'
-                                    ]
-                                ]) ?>
-                                <?= Html::a('Tolak', ['reject', 'id' => $item->id], [
-                                    'class' => 'btn btn-sm btn-danger',
-                                    'data' => [
-                                        'confirm' => 'Tolak peminjaman ini?',
-                                        'method' => 'post'
-                                    ]
-                                ]) ?>
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <?= Html::a('<i class="fas fa-check"></i>', ['approve', 'id' => $item->id], [
+                                        'class' => 'btn btn-success',
+                                        'title' => 'Setujui',
+                                        'data' => [
+                                            'confirm' => 'Setujui peminjaman ini?',
+                                            'method' => 'post'
+                                        ]
+                                    ]) ?>
+                                    <?= Html::a('<i class="fas fa-times"></i>', ['reject', 'id' => $item->id], [
+                                        'class' => 'btn btn-danger',
+                                        'title' => 'Tolak',
+                                        'data' => [
+                                            'confirm' => 'Tolak peminjaman ini?',
+                                            'method' => 'post'
+                                        ]
+                                    ]) ?>
+                                </div>
                             <?php else: ?>
-                                <span class="text-muted">-</span>
+                                <span class="text-muted small">Tidak ada aksi</span>
                             <?php endif; ?>
                         </td>
                     <?php endif; ?>

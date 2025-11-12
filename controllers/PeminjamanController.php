@@ -159,7 +159,7 @@ class PeminjamanController extends Controller
         return $this->redirect(['index']);
     }
 
-    public function generateSesiOptions()
+    public function generateSesiOptions($type = 'mulai')
 {
     $sesi = [];
     $startTime = strtotime('07:00');
@@ -169,7 +169,14 @@ class PeminjamanController extends Controller
     for ($time = $startTime; $time < $endTime; $time = strtotime('+45 minutes', $time)) {
         $jamMulai = date('H:i', $time);
         $jamSelesai = date('H:i', strtotime('+45 minutes', $time));
-        $sesi[$jamMulai] = "Sesi $counter: $jamMulai - $jamSelesai";
+        
+        if ($type === 'mulai') {
+            // Untuk dropdown MULAI: tampilkan jam mulai sesi
+            $sesi[$jamMulai] = "Sesi $counter: $jamMulai - $jamSelesai";
+        } else {
+            // Untuk dropdown SELESAI: tampilkan jam selesai sesi
+            $sesi[$jamSelesai] = "Sesi $counter: $jamMulai - $jamSelesai (Selesai: $jamSelesai)";
+        }
         $counter++;
     }
     

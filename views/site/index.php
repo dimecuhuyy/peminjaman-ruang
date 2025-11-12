@@ -204,7 +204,6 @@ $this->title = 'Dashboard';
                                 <th width="120">Tanggal</th>
                                 <th width="120">Jam</th>
                                 <th width="100">Status</th>
-                                <th width="80">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -226,12 +225,6 @@ $this->title = 'Dashboard';
                                     ];
                                     echo $statuses[$peminjaman->status] ?? '<span class="badge bg-secondary">Unknown</span>';
                                     ?>
-                                </td>
-                                <td class="text-center">
-                                    <?= Html::a('<i class="fas fa-eye"></i>', ['peminjaman/view', 'id' => $peminjaman->id], [
-                                        'class' => 'btn btn-sm btn-info',
-                                        'title' => 'Lihat Detail'
-                                    ]) ?>
                                 </td>
                             </tr>
                             <?php endforeach; ?>

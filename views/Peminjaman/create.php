@@ -41,27 +41,27 @@ $this->title = 'Ajukan Peminjaman Ruang';
 
             <!-- Ganti input time dengan select sesi -->
             <div class="row">
-                <div class="col-md-6">
-                    <?= $form->field($model, 'jam_mulai')->dropDownList(
-                        $this->context->generateSesiOptions(),
-                        [
-                            'prompt' => '-- Pilih Sesi Mulai --',
-                            'class' => 'form-control',
-                            'id' => 'jam-mulai'
-                        ]
-                    )->label('Sesi Mulai') ?>
-                </div>
-                <div class="col-md-6">
-                    <?= $form->field($model, 'jam_selesai')->dropDownList(
-                        $this->context->generateSesiOptions(),
-                        [
-                            'prompt' => '-- Pilih Sesi Selesai --',
-                            'class' => 'form-control',
-                            'id' => 'jam-selesai'
-                        ]
-                    )->label('Sesi Selesai') ?>
-                </div>
-            </div>
+    <div class="col-md-6">
+        <?= $form->field($model, 'jam_mulai')->dropDownList(
+            $this->context->generateSesiOptions('mulai'), // Untuk mulai
+            [
+                'prompt' => '-- Pilih Sesi Mulai --',
+                'class' => 'form-control',
+                'id' => 'jam-mulai'
+            ]
+        )->label('Sesi Mulai') ?>
+    </div>
+    <div class="col-md-6">
+        <?= $form->field($model, 'jam_selesai')->dropDownList(
+            $this->context->generateSesiOptions('selesai'), // Untuk selesai
+            [
+                'prompt' => '-- Pilih Sesi Selesai --',
+                'class' => 'form-control',
+                'id' => 'jam-selesai'
+            ]
+        )->label('Sesi Selesai') ?>
+    </div>
+</div>
 
             <!-- Info jumlah sesi -->
             <div class="alert alert-info" id="sesi-info" style="display: none;">
@@ -126,26 +126,38 @@ $this->title = 'Ajukan Peminjaman Ruang';
     </div>
 </div>
 
-<?php
 // JavaScript untuk menghitung jumlah sesi
+<?php
 $this->registerJs(<<<JS
     function calculateSesi() {
-        var jamMulai = $('#jam-mulai').val();
-        var jamSelesai = $('#jam-selesai').val();
+        var jamMulai = $('#jam-mulai').val();  // Format: HH:MM (mulai)
+        var jamSelesai = $('#jam-selesai').val(); // Format: HH:MM (selesai)
         
         if (jamMulai && jamSelesai) {
-            var mulaiIndex = $('#jam-mulai option').index($('#jam-mulai option:selected'));
-            var selesaiIndex = $('#jam-selesai option').index($('#jam-selesai option:selected'));
+            // Konversi ke timestamp untuk perbandingan
+            var mulaiTime = new Date('1970-01-01T' + jamMulai + ':00');
+            var selesaiTime = new Date('1970-01-01T' + jamSelesai + ':00');
             
-            if (selesaiIndex > mulaiIndex) {
-                var jumlahSesi = selesaiIndex - mulaiIndex;
+            if (selesaiTime > mulaiTime) {
+                // Hitung selisih dalam menit
+                var diffMenit = (selesaiTime - mulaiTime) / (1000 * 60);
+                var jumlahSesi = Math.ceil(diffMenit / 45);
                 var totalMenit = jumlahSesi * 45;
                 
                 $('#jumlah-sesi').text(jumlahSesi);
                 $('#total-menit').text(totalMenit);
                 $('#sesi-info').show();
+                
+                // Validasi: hapus error jika valid
+                $('#jam-selesai').removeClass('is-invalid');
+                $('#jam-selesai').next('.invalid-feedback').remove();
             } else {
                 $('#sesi-info').hide();
+                // Tampilkan error jika jam selesai <= jam mulai
+                if (!$('#jam-selesai').hasClass('is-invalid')) {
+                    $('#jam-selesai').addClass('is-invalid');
+                    $('#jam-selesai').after('<div class="invalid-feedback">Jam selesai harus setelah jam mulai</div>');
+                }
             }
         } else {
             $('#sesi-info').hide();
@@ -154,6 +166,23 @@ $this->registerJs(<<<JS
     
     $('#jam-mulai, #jam-selesai').change(function() {
         calculateSesi();
+    });
+    
+    // Validasi saat submit form
+    $('#peminjaman-form').on('beforeSubmit', function() {
+        var jamMulai = $('#jam-mulai').val();
+        var jamSelesai = $('#jam-selesai').val();
+        
+        if (jamMulai && jamSelesai) {
+            var mulaiTime = new Date('1970-01-01T' + jamMulai + ':00');
+            var selesaiTime = new Date('1970-01-01T' + jamSelesai + ':00');
+            
+            if (selesaiTime <= mulaiTime) {
+                alert('Error: Jam selesai harus setelah jam mulai!');
+                return false;
+            }
+        }
+        return true;
     });
 JS
 );
