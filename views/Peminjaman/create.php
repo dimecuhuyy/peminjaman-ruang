@@ -126,7 +126,7 @@ $this->title = 'Ajukan Peminjaman Ruang';
     </div>
 </div>
 
-// JavaScript untuk menghitung jumlah sesi
+
 <?php
 $this->registerJs(<<<JS
     function calculateSesi() {
