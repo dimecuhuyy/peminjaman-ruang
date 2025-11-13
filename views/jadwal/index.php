@@ -46,11 +46,12 @@ $this->title = 'Jadwal Reguler Ruang';
                                         <td rowspan="<?= count($jadwalHari) ?>"><strong><?= $hari ?></strong></td>
                                     <?php endif; ?>
                                     <td><?= Html::encode($jadwal->ruang->nama_ruang) ?></td>
-                                    <td>
-                                        <span class="badge bg-primary">
-                                            <?= $jadwal->getDisplayJam() ?>
-                                        </span>
-                                    </td>
+                                    <!-- Di dalam tabel, ubah kolom Jam -->
+<td>
+    <span class="badge bg-primary">
+        <?= $jadwal->getDisplayJamWithSesi() ?>
+    </span>
+</td>
                                     <td><?= Html::encode($jadwal->keterangan) ?></td>
                                     <td><?= Html::encode($jadwal->user->username) ?></td>
                                     <?php if (Yii::$app->user->identity->isAdministrator() || Yii::$app->user->identity->isPetugas()): ?>

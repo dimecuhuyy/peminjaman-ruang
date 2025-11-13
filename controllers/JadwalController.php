@@ -36,6 +36,12 @@ class JadwalController extends Controller
         ];
     }
 
+    // ✅ TAMBAHKAN METHOD UNTUK GENERATE SESI
+    public function generateSesiOptions($type = 'mulai')
+    {
+        return JadwalReguler::generateSesiOptions($type);
+    }
+
     public function actionIndex()
     {
         // Get all jadwal reguler grouped by hari

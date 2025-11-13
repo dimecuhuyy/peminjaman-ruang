@@ -75,6 +75,50 @@ class JadwalReguler extends ActiveRecord
         return date('H:i', strtotime($this->jam_mulai)) . ' - ' . date('H:i', strtotime($this->jam_selesai));
     }
 
+    // ✅ TAMBAHKAN METHOD UNTUK SISTEM SESI
+    public static function generateSesiOptions($type = 'mulai')
+    {
+        $sesi = [];
+        $startTime = strtotime('07:00');
+        $endTime = strtotime('17:00');
+        
+        $counter = 1;
+        for ($time = $startTime; $time < $endTime; $time = strtotime('+45 minutes', $time)) {
+            $jamMulai = date('H:i', $time);
+            $jamSelesai = date('H:i', strtotime('+45 minutes', $time));
+            
+            if ($type === 'mulai') {
+                $sesi[$jamMulai] = "Sesi $counter: $jamMulai - $jamSelesai";
+            } else {
+                $sesi[$jamSelesai] = "Sesi $counter: $jamMulai - $jamSelesai (Selesai: $jamSelesai)";
+            }
+            $counter++;
+        }
+        
+        return $sesi;
+    }
+
+    public function getJumlahSesi()
+    {
+        if ($this->jam_mulai && $this->jam_selesai) {
+            $mulai = strtotime($this->jam_mulai);
+            $selesai = strtotime($this->jam_selesai);
+            $diff = ($selesai - $mulai) / 60; // difference in minutes
+            return ceil($diff / 45); // convert to 45-minute sessions
+        }
+        return 0;
+    }
+
+    public function getDurasiMenit()
+    {
+        return $this->getJumlahSesi() * 45;
+    }
+
+    public function getDisplayJamWithSesi()
+    {
+        return $this->getDisplayJam() . ' (' . $this->getJumlahSesi() . ' sesi)';
+    }
+
     public function beforeSave($insert)
     {
         if (parent::beforeSave($insert)) {
