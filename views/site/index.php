@@ -129,11 +129,21 @@ $this->title = 'Dashboard';
                                     'class' => 'btn btn-outline-primary w-100 h-100 py-3'
                                 ]) ?>
                             </div>
-                            <div class="col-md-3 col-sm-6 mb-3">
-                                <?= Html::a('<i class="fas fa-building me-2"></i>Manajemen Ruang', ['ruang/index'], [
-                                    'class' => 'btn btn-outline-success w-100 h-100 py-3'
-                                ]) ?>
-                            </div>
+                            <!-- TOMBOL MANAJEMEN RUANG HANYA UNTUK ADMINISTRATOR -->
+                            <?php if ($user->isAdministrator()): ?>
+                                <div class="col-md-3 col-sm-6 mb-3">
+                                    <?= Html::a('<i class="fas fa-building me-2"></i>Manajemen Ruang', ['ruang/index'], [
+                                        'class' => 'btn btn-outline-success w-100 h-100 py-3'
+                                    ]) ?>
+                                </div>
+                            <?php else: ?>
+                                <!-- Untuk Petugas: Tombol alternatif atau spacer -->
+                                <div class="col-md-3 col-sm-6 mb-3">
+                                    <?= Html::a('<i class="fas fa-eye me-2"></i>Lihat Ruang', ['jadwal/index'], [
+                                        'class' => 'btn btn-outline-secondary w-100 h-100 py-3'
+                                    ]) ?>
+                                </div>
+                            <?php endif; ?>
                             <div class="col-md-3 col-sm-6 mb-3">
                                 <?= Html::a('<i class="fas fa-chart-bar me-2"></i>Laporan', ['laporan/index'], [
                                     'class' => 'btn btn-outline-info w-100 h-100 py-3'

@@ -10,23 +10,23 @@ use app\models\Ruang;
 class RuangController extends Controller
 {
     public function behaviors()
-    {
-        return [
-            'access' => [
-                'class' => AccessControl::class,
-                'rules' => [
-                    [
-                        'allow' => true,
-                        'roles' => ['@'],
-                        'matchCallback' => function ($rule, $action) {
-                            return Yii::$app->user->identity->isAdministrator() || 
-                                   Yii::$app->user->identity->isPetugas();
-                        }
-                    ],
+{
+    return [
+        'access' => [
+            'class' => AccessControl::class,
+            'rules' => [
+                [
+                    'allow' => true,
+                    'roles' => ['@'],
+                    'matchCallback' => function ($rule, $action) {
+                        // HANYA ADMINISTRATOR yang bisa akses manajemen ruang
+                        return Yii::$app->user->identity->isAdministrator();
+                    }
                 ],
             ],
-        ];
-    }
+        ],
+    ];
+}
 
     public function actionIndex()
     {

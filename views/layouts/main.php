@@ -642,11 +642,7 @@ $user = Yii::$app->user->identity;
                                 <i class="fas fa-clipboard-list me-1"></i>Kelola Peminjaman
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="<?= Url::to(['ruang/index']) ?>">
-                                <i class="fas fa-building me-1"></i>Manajemen Ruang
-                            </a>
-                        </li>
+                        <!-- MENU MANAJEMEN RUANG DIHAPUS UNTUK PETUGAS -->
                         <li class="nav-item">
                             <a class="nav-link" href="<?= Url::to(['jadwal/index']) ?>">
                                 <i class="fas fa-calendar-alt me-1"></i>Jadwal
