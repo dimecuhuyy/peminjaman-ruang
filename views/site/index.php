@@ -113,69 +113,62 @@ $this->title = 'Dashboard';
     </div>
 
     <!-- Quick Actions -->
-    <div class="row mt-4">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">
-                        <i class="fas fa-bolt me-2"></i>Aksi Cepat
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <?php if ($user->isAdministrator() || $user->isPetugas()): ?>
-                            <div class="col-md-3 col-sm-6 mb-3">
-                                <?= Html::a('<i class="fas fa-clipboard-list me-2"></i>Kelola Peminjaman', ['peminjaman/index'], [
-                                    'class' => 'btn btn-outline-primary w-100 h-100 py-3'
-                                ]) ?>
-                            </div>
-                            <!-- TOMBOL MANAJEMEN RUANG HANYA UNTUK ADMINISTRATOR -->
-                            <?php if ($user->isAdministrator()): ?>
-                                <div class="col-md-3 col-sm-6 mb-3">
-                                    <?= Html::a('<i class="fas fa-building me-2"></i>Manajemen Ruang', ['ruang/index'], [
-                                        'class' => 'btn btn-outline-success w-100 h-100 py-3'
-                                    ]) ?>
-                                </div>
-                            <?php else: ?>
-                                <!-- Untuk Petugas: Tombol alternatif atau spacer -->
-                                <div class="col-md-3 col-sm-6 mb-3">
-                                    <?= Html::a('<i class="fas fa-eye me-2"></i>Lihat Ruang', ['jadwal/index'], [
-                                        'class' => 'btn btn-outline-secondary w-100 h-100 py-3'
-                                    ]) ?>
-                                </div>
-                            <?php endif; ?>
-                            <div class="col-md-3 col-sm-6 mb-3">
-                                <?= Html::a('<i class="fas fa-chart-bar me-2"></i>Laporan', ['laporan/index'], [
-                                    'class' => 'btn btn-outline-info w-100 h-100 py-3'
-                                ]) ?>
-                            </div>
-                            <div class="col-md-3 col-sm-6 mb-3">
-                                <?= Html::a('<i class="fas fa-calendar-alt me-2"></i>Jadwal', ['jadwal/index'], [
-                                    'class' => 'btn btn-outline-warning w-100 h-100 py-3'
-                                ]) ?>
-                            </div>
-                        <?php else: ?>
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-bolt me-2"></i>Aksi Cepat
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <?php if ($user->isAdministrator() || $user->isPetugas()): ?>
+                        <div class="col-md-4 col-sm-6 mb-3">
+                            <?= Html::a('<i class="fas fa-clipboard-list me-2"></i>Kelola Peminjaman', ['peminjaman/index'], [
+                                'class' => 'btn btn-outline-primary w-100 h-100 py-3'
+                            ]) ?>
+                        </div>
+                        <!-- TOMBOL MANAJEMEN RUANG HANYA UNTUK ADMINISTRATOR -->
+                        <?php if ($user->isAdministrator()): ?>
                             <div class="col-md-4 col-sm-6 mb-3">
-                                <?= Html::a('<i class="fas fa-plus-circle me-2"></i>Ajukan Peminjaman', ['peminjaman/create'], [
-                                    'class' => 'btn btn-outline-primary w-100 h-100 py-3'
-                                ]) ?>
-                            </div>
-                            <div class="col-md-4 col-sm-6 mb-3">
-                                <?= Html::a('<i class="fas fa-history me-2"></i>Status Peminjaman', ['peminjaman/index'], [
+                                <?= Html::a('<i class="fas fa-building me-2"></i>Manajemen Ruang', ['ruang/index'], [
                                     'class' => 'btn btn-outline-success w-100 h-100 py-3'
                                 ]) ?>
                             </div>
-                            <div class="col-md-4 col-sm-6 mb-3">
-                                <?= Html::a('<i class="fas fa-calendar-alt me-2"></i>Jadwal Ruang', ['jadwal/index'], [
-                                    'class' => 'btn btn-outline-info w-100 h-100 py-3'
-                                ]) ?>
-                            </div>
                         <?php endif; ?>
-                    </div>
+                        <div class="col-md-4 col-sm-6 mb-3">
+                            <?= Html::a('<i class="fas fa-chart-bar me-2"></i>Laporan', ['laporan/index'], [
+                                'class' => 'btn btn-outline-info w-100 h-100 py-3'
+                            ]) ?>
+                        </div>
+                        <div class="col-md-4 col-sm-6 mb-3">
+                            <?= Html::a('<i class="fas fa-calendar-alt me-2"></i>Jadwal', ['jadwal/index'], [
+                                'class' => 'btn btn-outline-warning w-100 h-100 py-3'
+                            ]) ?>
+                        </div>
+                    <?php else: ?>
+                        <div class="col-md-4 col-sm-6 mb-3">
+                            <?= Html::a('<i class="fas fa-plus-circle me-2"></i>Ajukan Peminjaman', ['peminjaman/create'], [
+                                'class' => 'btn btn-outline-primary w-100 h-100 py-3'
+                            ]) ?>
+                        </div>
+                        <div class="col-md-4 col-sm-6 mb-3">
+                            <?= Html::a('<i class="fas fa-history me-2"></i>Status Peminjaman', ['peminjaman/index'], [
+                                'class' => 'btn btn-outline-success w-100 h-100 py-3'
+                            ]) ?>
+                        </div>
+                        <div class="col-md-4 col-sm-6 mb-3">
+                            <?= Html::a('<i class="fas fa-calendar-alt me-2"></i>Jadwal Ruang', ['jadwal/index'], [
+                                'class' => 'btn btn-outline-info w-100 h-100 py-3'
+                            ]) ?>
+                        </div>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
     <!-- Recent Peminjaman -->
     <div class="card mt-4">
