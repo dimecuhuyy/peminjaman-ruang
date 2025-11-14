@@ -1,8 +1,0 @@
-RewriteEngine on
-
-# Jika direktori atau file ada, langsung akses
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-
-# Jika tidak, arahkan ke index.php
-RewriteRule . index.php
