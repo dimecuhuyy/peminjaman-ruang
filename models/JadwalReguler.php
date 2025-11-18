@@ -130,4 +130,35 @@ class JadwalReguler extends ActiveRecord
         }
         return false;
     }
+
+    // ✅ TAMBAHKAN METHOD UNTUK CEK BENTROK JADWAL
+public static function checkAvailability($id_room, $hari, $jam_mulai, $jam_selesai, $exclude_id = null)
+{
+    $query = self::find()
+        ->where(['id_room' => $id_room])  // GUNAKAN id_room BUKAN ruang_id
+        ->andWhere(['nama_hari' => $hari])
+        ->andWhere(['or',
+            ['and', ['<=', 'jam_mulai', $jam_mulai], ['>', 'jam_selesai', $jam_mulai]],
+            ['and', ['<', 'jam_mulai', $jam_selesai], ['>=', 'jam_selesai', $jam_selesai]],
+            ['and', ['>=', 'jam_mulai', $jam_mulai], ['<=', 'jam_selesai', $jam_selesai]]
+        ]);
+
+    if ($exclude_id) {
+        $query->andWhere(['!=', 'id_reguler', $exclude_id]);  // GUNAKAN id_reguler BUKAN id
+    }
+
+    $existing = $query->one();
+
+    if ($existing) {
+        return [
+            'available' => false,
+            'message' => "Ruang sudah terpakai pada hari $hari jam {$existing->jam_mulai} - {$existing->jam_selesai}"
+        ];
+    }
+
+    return [
+        'available' => true,
+        'message' => 'Jadwal tersedia'
+    ];
+}
 }
