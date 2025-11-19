@@ -75,9 +75,10 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
     public function validatePassword($password)
-    {
-        return $this->password === $password;
-    }
+{
+    // Bandingkan MD5 dari input password dengan password di database
+    return $this->password === md5($password);
+}
 
     public function isAdministrator()
     {
@@ -95,16 +96,21 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
     public function beforeSave($insert)
-    {
-        if (parent::beforeSave($insert)) {
-            if ($insert) {
-                $this->created_at = date('Y-m-d H:i:s');
-            }
-            $this->updated_at = date('Y-m-d H:i:s');
-            return true;
+{
+    if (parent::beforeSave($insert)) {
+        // Auto-encrypt password jika masih plaintext
+        if ($this->isAttributeChanged('password') && strlen($this->password) < 32) {
+            $this->password = md5($this->password);
         }
-        return false;
+        
+        if ($insert) {
+            $this->created_at = date('Y-m-d H:i:s');
+        }
+        $this->updated_at = date('Y-m-d H:i:s');
+        return true;
     }
+    return false;
+}
 
     public function getRoleLabel()
     {
