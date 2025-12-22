@@ -1,4 +1,5 @@
 <?php
+
 namespace app\controllers;
 
 use Yii;
@@ -35,30 +36,30 @@ class UserController extends Controller
     }
 
     public function actionRegister()
-{
-    if (!Yii::$app->user->isGuest) {
-        return $this->goHome();
-    }
-
-    $model = new RegisterForm();
-    
-    // Force role menjadi peminjam untuk registrasi public
-    $model->role = User::ROLE_PEMINJAM;
-
-    if ($model->load(Yii::$app->request->post())) {
-        // Pastikan role tetap peminjam meskipun user mencoba mengubahnya
-        $model->role = User::ROLE_PEMINJAM;
-        
-        if ($model->register()) {
-            Yii::$app->session->setFlash('success', 'Registrasi berhasil! Silakan login.');
-            return $this->redirect(['site/login']);
+    {
+        if (!Yii::$app->user->isGuest) {
+            return $this->goHome();
         }
-    }
 
-    return $this->render('register', [
-        'model' => $model,
-    ]);
-}
+        $model = new RegisterForm();
+
+        // Force role menjadi peminjam untuk registrasi public
+        $model->role = User::ROLE_PEMINJAM;
+
+        if ($model->load(Yii::$app->request->post())) {
+            // Pastikan role tetap peminjam meskipun user mencoba mengubahnya
+            $model->role = User::ROLE_PEMINJAM;
+
+            if ($model->register()) {
+                Yii::$app->session->setFlash('success', 'Registrasi berhasil! Silakan login.');
+                return $this->redirect(['site/login']);
+            }
+        }
+
+        return $this->render('register', [
+            'model' => $model,
+        ]);
+    }
 
     public function actionIndex()
     {
@@ -69,58 +70,58 @@ class UserController extends Controller
     }
 
     public function actionCreate()
-{
-    $model = new RegisterForm();
+    {
+        $model = new RegisterForm();
 
-    if ($model->load(Yii::$app->request->post())) {
-        // Untuk admin yang membuat user, izinkan semua role
-        if ($model->register()) {
-            Yii::$app->session->setFlash('success', 'User berhasil dibuat.');
-            return $this->redirect(['index']);
-        } else {
-            Yii::$app->session->setFlash('error', 'Gagal membuat user. Silakan periksa data Anda.');
-            Yii::error('Register error: ' . print_r($model->errors, true));
+        if ($model->load(Yii::$app->request->post())) {
+            // Untuk admin yang membuat user, izinkan semua role
+            if ($model->register()) {
+                Yii::$app->session->setFlash('success', 'User berhasil dibuat.');
+                return $this->redirect(['index']);
+            } else {
+                Yii::$app->session->setFlash('error', 'Gagal membuat user. Silakan periksa data Anda.');
+                Yii::error('Register error: ' . print_r($model->errors, true));
+            }
         }
+
+        return $this->render('create', [
+            'model' => $model,
+        ]);
     }
 
-    return $this->render('create', [
-        'model' => $model,
-    ]);
-}
+    public function actionUpdate($id)
+    {
+        $user = $this->findModel($id);
+        $model = new RegisterForm();
 
-public function actionUpdate($id)
-{
-    $user = $this->findModel($id);
-    $model = new RegisterForm();
-    
-    // Set nilai awal dari user yang akan diupdate
-    $model->username = $user->username;
-    $model->email = $user->email;
-    $model->role = $user->role;
+        // Set nilai awal dari user yang akan diupdate
+        $model->username = $user->username;
+        $model->email = $user->email;
+        $model->role = $user->role;
 
-    if ($model->load(Yii::$app->request->post())) {
-        $user->username = $model->username;
-        $user->email = $model->email;
-        $user->role = $model->role; // Pastikan role terupdate
-        
-        if (!empty($model->password)) {
-            $user->password = $model->password;
+        if ($model->load(Yii::$app->request->post())) {
+            $user->username = $model->username;
+            $user->email = $model->email;
+            $user->role = $model->role; // Pastikan role terupdate
+
+            if (!empty($model->password)) {
+                $user->password = $model->password;
+            }
+
+            if ($user->save()) {
+                Yii::$app->session->setFlash('success', 'User berhasil diupdate.');
+                return $this->redirect(['index']);
+            } else {
+                Yii::$app->session->setFlash('error', 'Gagal mengupdate user.');
+                Yii::error('Update user error: ' . print_r($user->errors, true));
+            }
         }
-        
-        if ($user->save()) {
-            Yii::$app->session->setFlash('success', 'User berhasil diupdate.');
-            return $this->redirect(['index']);
-        } else {
-            Yii::$app->session->setFlash('error', 'Gagal mengupdate user.');
-            Yii::error('Update user error: ' . print_r($user->errors, true));
-        }
+
+        return $this->render('update', [
+            'model' => $model,
+            'user' => $user,
+        ]);
     }
-
-    return $this->render('update', [
-        'model' => $model,
-        'user' => $user,
-    ]);
-}
 
     public function actionDelete($id)
     {
